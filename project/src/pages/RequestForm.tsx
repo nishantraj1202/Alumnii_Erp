@@ -76,7 +76,7 @@ const RequestForm = () => {
 
     fetchUserProfile();
   }, [navigate]);
-
+//@ts-ignore
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -84,7 +84,7 @@ const RequestForm = () => {
       [name]: value
     }));
   };
-
+//@ts-ignore
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) return;
@@ -124,7 +124,9 @@ const RequestForm = () => {
       navigate('/dashboard', { 
         state: { message: 'Certificate request submitted successfully!' }
       });
+      
     } catch (err) {
+      //@ts-ignore
       setError(err.message || 'Failed to submit request. Please try again.');
     } finally {
       setLoading(false);
@@ -154,6 +156,16 @@ const RequestForm = () => {
     </div>
   );
 
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+  };
+  
+  const validatePhoneNumber = (phone: string) => {
+    const phoneRegex = /^[0-9]{10}$/;
+    return phoneRegex.test(phone);
+  };
+  
   const renderPersonalInfo = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -170,7 +182,7 @@ const RequestForm = () => {
             className="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
-
+  
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Roll Number
@@ -185,7 +197,7 @@ const RequestForm = () => {
             placeholder="Enter your roll number"
           />
         </div>
-
+  
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Branch
@@ -205,7 +217,7 @@ const RequestForm = () => {
             ))}
           </select>
         </div>
-
+  
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Batch Year
@@ -220,7 +232,7 @@ const RequestForm = () => {
             className="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
-
+  
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Mobile Number
@@ -231,10 +243,15 @@ const RequestForm = () => {
             value={formData.mobileNo}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            className={`w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 ${
+              formData.mobileNo && !validatePhoneNumber(formData.mobileNo) ? "border-red-500" : ""
+            }`}
           />
+          {formData.mobileNo && !validatePhoneNumber(formData.mobileNo) && (
+            <p className="text-red-500 text-sm mt-1">Enter a valid 10-digit phone number.</p>
+          )}
         </div>
-
+  
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Alternative Number
@@ -244,10 +261,15 @@ const RequestForm = () => {
             name="alternativeNo"
             value={formData.alternativeNo}
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            className={`w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 ${
+              formData.alternativeNo && !validatePhoneNumber(formData.alternativeNo) ? "border-red-500" : ""
+            }`}
           />
+          {formData.alternativeNo && !validatePhoneNumber(formData.alternativeNo) && (
+            <p className="text-red-500 text-sm mt-1">Enter a valid 10-digit phone number.</p>
+          )}
         </div>
-
+  
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Email
@@ -258,10 +280,15 @@ const RequestForm = () => {
             value={formData.email}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            className={`w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 ${
+              formData.email && !validateEmail(formData.email) ? "border-red-500" : ""
+            }`}
           />
+          {formData.email && !validateEmail(formData.email) && (
+            <p className="text-red-500 text-sm mt-1">Enter a valid email address.</p>
+          )}
         </div>
-
+  
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Alternative Email
@@ -271,12 +298,18 @@ const RequestForm = () => {
             name="alternativeEmail"
             value={formData.alternativeEmail}
             onChange={handleChange}
-            className="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            className={`w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 ${
+              formData.alternativeEmail && !validateEmail(formData.alternativeEmail) ? "border-red-500" : ""
+            }`}
           />
+          {formData.alternativeEmail && !validateEmail(formData.alternativeEmail) && (
+            <p className="text-red-500 text-sm mt-1">Enter a valid email address.</p>
+          )}
         </div>
       </div>
     </div>
   );
+  
 
   const renderPlacementInfo = () => (
     <div className="space-y-6">

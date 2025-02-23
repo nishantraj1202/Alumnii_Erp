@@ -143,6 +143,7 @@ export default function Home() {
   };
 
   return (
+    <div>
     <div className="space-y-12 animate-fade-in">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
@@ -160,6 +161,7 @@ export default function Home() {
               {navItems.map((item) => (
                 <Link
                   key={item.name}
+                  //@ts-ignore
                   to={item.path}
                   className="text-gray-600 hover:text-indigo-600 transition-colors"
                 >
@@ -199,6 +201,7 @@ export default function Home() {
               {navItems.map((item) => (
                 <Link
                   key={item.name}
+                  //@ts-ignore
                   to={item.path}
                   className="block py-2 text-gray-600 hover:text-indigo-600 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
@@ -228,76 +231,77 @@ export default function Home() {
       </header>
 
       {/* Add margin-top to account for fixed header */}
-      <div className="pt-1">
-        {/* Hero Slider */}
-        <div className="relative h-[600px] overflow-hidden rounded-2xl shadow-2xl m-20">
-          {slides.map((slide, index) => (
-            <div
-              key={index}
-              className="absolute inset-0 transition-opacity duration-1000"
-              style={{
-                opacity: index === currentSlide ? 1 : 0,
-                backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(${slide.image})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
-              }}
-            >
-              <div className="h-full flex flex-col justify-center items-center text-center text-white p-8">
-                <h1 className="text-5xl font-bold mb-4 animate-slide-up">{slide.title}</h1>
-                <p className="text-xl mb-8 animate-slide-up">{slide.subtitle}</p>
-                <div className="space-x-4 animate-slide-up">
-                  <Link
-                    to="/login"
-                    className="bg-[#1a237e] hover:bg-[#283593] text-white px-8 py-3 rounded-lg font-medium transition-all duration-300 hover:scale-105 shadow-lg"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="bg-white hover:bg-gray-100 text-[#1a237e] px-8 py-3 rounded-lg font-medium transition-all duration-300 hover:scale-105 shadow-lg"
-                  >
-                    Register
-                  </Link>
+        <div className="pt-8">
+          {/* Hero Slider */}
+          <div className="relative h-[400px] sm:h-[500px] md:h-[600px] overflow-hidden rounded-2xl shadow-2xl mx-4 sm:mx-10 md:mx-20">
+            {slides.map((slide, index) => (
+              <div
+                key={index}
+                className="absolute inset-0 transition-opacity duration-1000"
+                style={{
+                  opacity: index === currentSlide ? 1 : 0,
+                  backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url(${slide.image})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
+                }}
+              >
+                <div className="h-full flex flex-col justify-center items-center text-center text-white px-4 sm:px-8">
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 animate-slide-up">{slide.title}</h1>
+                  <p className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 animate-slide-up">{slide.subtitle}</p>
+                  <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 animate-slide-up">
+                    <Link
+                      to="/login"
+                      className="bg-[#1a237e] hover:bg-[#283593] text-white px-6 py-2 sm:px-8 sm:py-3 rounded-lg font-medium transition-all duration-300 hover:scale-105 shadow-lg"
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      to="/register"
+                      className="bg-white hover:bg-gray-100 text-[#1a237e] px-6 py-2 sm:px-8 sm:py-3 rounded-lg font-medium transition-all duration-300 hover:scale-105 shadow-lg"
+                    >
+                      Register
+                    </Link>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-          
-          {/* Slide indicators */}
-          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2">
-            {slides.map((_, index) => (
-              <button
-                key={index}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentSlide ? 'bg-white scale-125' : 'bg-white/50'
-                }`}
-                onClick={() => setCurrentSlide(index)}
-              />
             ))}
-          </div>
-        </div>
-
-        {/* Achievement Numbers */}
-        <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 py-10 px-8 mx-20 rounded-2xl shadow-xl">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {achievements.map((achievement, index) => (
-                <div 
+            </div>
+            {/* Slide indicators */}
+            <div className=" absolute bottom-4 sm:bottom-6 sm:pb-20 left-1/2 transform -translate-x-1/2 flex space-x-2">
+              {slides.map((_, index) => (
+                <button
                   key={index}
-                  className="text-center text-white p-6 transform hover:scale-105 transition-transform duration-300"
-                >
-                  <achievement.icon className="h-12 w-12 mx-auto mb-4 animate-float" />
-                  <div className="text-4xl font-bold mb-2">{achievement.number}</div>
-                  <div className="text-indigo-200">{achievement.label}</div>
-                </div>
+                  className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
+                    index === currentSlide ? 'bg-white scale-125' : 'bg-white/50'
+                  }`}
+                  onClick={() => setCurrentSlide(index)}
+                />
               ))}
+            </div>  
+        </div>
+          {/* Achievement Numbers */}
+          <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 py-6 px-4 sm:py-10 sm:px-8 max-sm:mx-2 sm:mx-10 md:mx-20 rounded-2xl shadow-xl">
+            <div className="max-w-7xl mx-auto">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
+                {achievements.map((achievement, index) => (
+                  <div 
+                    key={index}
+                    className="text-center text-white p-2 sm:p-6 transform hover:scale-105 transition-transform duration-300"
+                  >
+                    <achievement.icon className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-2 sm:mb-4 animate-float" />
+                    <div className="text-2xl sm:text-4xl font-bold mb-1 sm:mb-2">{achievement.number}</div>
+                    <div className="text-indigo-200 text-xs sm:text-base">{achievement.label}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
+
+        
 
         {/* Features */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 m-20">
-          {[
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 m-20 max-sm:max-w-screen-lg max-sm:w-full max-sm:mx-auto max-sm:px-4">
+        {[
             {
               icon: <GraduationCap className="h-6 w-6 text-[#1a237e]" />,
               title: "Digital Certificates",
@@ -330,9 +334,9 @@ export default function Home() {
         </div>
 
         {/* Testimonials */}
-        <div className="bg-gray-50 py-5 px-8 mx-20 rounded-2xl">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Alumni Success Stories</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        <div className="max-sm:max-w-screen-lg max-sm:w-full max-sm:mx-auto max-sm:px-4 bg-white rounded-2xl shadow-xl p-8 m-20">
+        <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Alumni Success Stories</h2>
+          <div className="grid grid-cols-1 max-w-8xl md:grid-cols-3 gap-8 max-w-8xl mx-auto">
             {testimonials.map((testimonial, index) => (
               <div 
                 key={index}
@@ -357,8 +361,8 @@ export default function Home() {
         </div>
 
         {/* About Section */}
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden m-20">
-          <div className="grid md:grid-cols-2 gap-8">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden m-20 max-w-screen-lg w-full mx-auto px-4">
+        <div className="grid md:grid-cols-2 gap-8">
             <div className="p-8 flex flex-col justify-center">
               <h2 className="text-3xl font-bold mb-4 text-[#1a237e]">About NIT Jalandhar</h2>
               <p className="text-gray-600 mb-6">
@@ -395,8 +399,8 @@ export default function Home() {
         </div>
 
         {/* News & Updates */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 m-20">
-          <div className="flex items-center justify-between mb-6">
+        <div className="max-sm:max-w-screen-lg max-sm:w-full max-sm:mx-auto max-sm:px-4 bg-white rounded-2xl shadow-xl p-8 m-20">
+        <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-[#1a237e]">Latest Updates</h2>
             <Link to="#" className="text-[#1a237e] hover:text-[#283593] flex items-center">
               View All <ArrowRight className="h-4 w-4 ml-1" />
@@ -435,9 +439,9 @@ export default function Home() {
             ))}
           </div>
         </div>
-
+      </div>
         {/* Enhanced Footer */}
-        <footer className="bg-gray-900 text-white py-16" id="contact">
+        <footer className="bg-gray-900 text-white py-14" id="contact">
           <div className="container mx-auto px-6" >
             <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
               {/* About */}
@@ -534,6 +538,5 @@ export default function Home() {
           </div>
         </footer>
       </div>
-    </div>
   );
 }

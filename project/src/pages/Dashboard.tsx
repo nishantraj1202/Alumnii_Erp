@@ -194,7 +194,7 @@ const Dashboard: React.FC = () => {
       title: 'Campus News',
       icon: Building2,
       color: 'bg-purple-100 text-purple-600',
-      link: '#'
+      link: 'https://www.nitj.ac.in/'
     }
   ];
 

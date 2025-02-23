@@ -5,15 +5,9 @@ import {
   FileText, 
   Settings, 
   LogOut, 
-  User,
   GraduationCap,
-  Bell,
-  HelpCircle,
-  Menu,
   X
 } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { cn } from '../lib/utils';
 import axios from 'axios';
 
 interface SidebarProps {
@@ -23,9 +17,11 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const location = useLocation();
-  const { logout, userRole } = useAuth();
+  const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
-  const navigate=useNavigate();
+  const token = localStorage.getItem('token'); // Get token from storage
+  const userRole = localStorage.getItem('role'); // Assuming role is stored
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 1024);
@@ -39,125 +35,66 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   }, [onClose]);
 
   const menuItems = [
-    {
-      title: 'Dashboard',
-      icon: LayoutDashboard,
-      path: '/dashboard',
-      show: true,
-    },
-    {
-      title: 'New Request',
-      icon: FileText,
-      path: '/request',
-      show: userRole === 'alumni',
-    },
-    {
-      title: 'Admin Panel',
-      icon: Settings,
-      path: '/admin',
-      show: userRole === 'admin',
-    },
+    { title: 'Dashboard', icon: LayoutDashboard, path: '/dashboard', show: true },
+    { title: 'New Request', icon: FileText, path: '/request', show: userRole === 'alumni' },
+    { title: 'Admin Panel', icon: Settings, path: '/admin', show: userRole === 'admin' },
   ];
 
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem('token');
-      
-      // Call logout endpoint
-      await axios.post('http://localhost:5000/auth/logout', {}, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      
-      // Clear local storage
-      localStorage.removeItem('token');
-      
-      // Redirect to login page
-      navigate('/');
+      if (token) {
+        await axios.post('http://localhost:5000/auth/logout', {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      }
     } catch (error) {
       console.error('Error logging out:', error);
-      // Even if the server request fails, clear local storage and redirect
+    } finally {
       localStorage.removeItem('token');
+      localStorage.removeItem('role');
       navigate('/');
     }
   };
 
   const handleLinkClick = () => {
-    if (isMobile) {
-      onClose();
-    }
+    if (isMobile) onClose();
   };
 
   return (
     <>
       {/* Overlay */}
-      {isMobile && isOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-20 transition-opacity"
-          onClick={onClose}
-        />
-      )}
+      {isMobile && isOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-20" onClick={onClose} />}
 
       {/* Sidebar */}
-      <div className={cn(
-        "fixed lg:static inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transform transition-transform duration-200 ease-in-out lg:transform-none",
-        isOpen ? "translate-x-0" : "-translate-x-full"
-      )}
-      
-      >
+      <div className={`fixed lg:static inset-y-0 left-0 z-30 w-64 bg-white border-r transform transition-transform ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}>
         <div className="flex flex-col h-screen">
           {/* Header */}
-          <div className="shrink-0 p-6 pt-4 flex items-center justify-between border-b border-gray-200">
+          <div className="p-6 flex items-center justify-between border-b">
             <Link to="/dashboard" className="flex items-center space-x-3" onClick={handleLinkClick}>
               <GraduationCap className="h-8 w-8 text-indigo-600" />
               <span className="text-xl font-bold text-gray-900">NITJ Alumni</span>
             </Link>
-            {isMobile && (
-              <button onClick={onClose} className="lg:hidden">
-                <X className="h-6 w-6 text-gray-500" />
-              </button>
-            )}
+            {isMobile && <button onClick={onClose}><X className="h-6 w-6 text-gray-500" /></button>}
           </div>
 
-          {/* Main Navigation */}
-          <div className="flex-1 flex flex-col justify-between">
-            <nav className="px-4 py-4">
-              <div className="space-y-1">
-                {menuItems.map((item) => 
-                  item.show && (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      onClick={handleLinkClick}
-                      className={cn(
-                        "flex items-center space-x-3 px-4 py-3 text-gray-600 rounded-lg transition-colors",
-                        location.pathname === item.path 
-                          ? "bg-indigo-50 text-indigo-600" 
-                          : "hover:bg-gray-50"
-                      )}
-                    >
-                      <item.icon className="h-5 w-5" />
-                      <span>{item.title}</span>
-                    </Link>
-                  )
-                )}
-              </div>
-            </nav>
+          {/* Navigation */}
+          <nav className="flex-1 px-4 py-4 space-y-1">
+            {menuItems.map(({ title, icon: Icon, path, show }) =>
+              show && (
+                <Link key={path} to={path} onClick={handleLinkClick} className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${location.pathname === path ? "bg-indigo-50 text-indigo-600" : "hover:bg-gray-50 text-gray-600"}`}>
+                  <Icon className="h-5 w-5" />
+                  <span>{title}</span>
+                </Link>
+              )
+            )}
+          </nav>
 
-            {/* Bottom Section */}
-            <div className="shrink-0 px-4 py-4 border-t border-gray-200">
-              <div className="space-y-1">
-                
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center space-x-3 px-4 py-3 text-red-600 w-full hover:bg-red-50 rounded-lg transition-colors"
-                >
-                  <LogOut className="h-5 w-5" />
-                  <span>Logout</span>
-                </button>
-              </div>
-            </div>
+          {/* Logout Button */}
+          <div className="p-4 border-t">
+            <button onClick={handleLogout} className="flex items-center space-x-3 px-4 py-3 text-red-600 w-full hover:bg-red-50 rounded-lg transition-colors">
+              <LogOut className="h-5 w-5" />
+              <span>Logout</span>
+            </button>
           </div>
         </div>
       </div>

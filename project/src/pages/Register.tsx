@@ -12,6 +12,8 @@ const Register = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,9 +23,67 @@ const Register = () => {
     }
   }, [navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const validateEmail = (email:string) => {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (!emailRegex.test(email)) {
+      setEmailError('Please enter a valid email address');
+      return false;
+    }
+    setEmailError('');
+    return true;
+  };
+
+  const validatePassword = (password:string) => {
+    if (password.length < 8) {
+      setPasswordError('Password must be at least 8 characters long');
+      return false;
+    }
+    if (!/[A-Z]/.test(password)) {
+      setPasswordError('Password must contain at least one uppercase letter');
+      return false;
+    }
+    if (!/[a-z]/.test(password)) {
+      setPasswordError('Password must contain at least one lowercase letter');
+      return false;
+    }
+    if (!/[0-9]/.test(password)) {
+      setPasswordError('Password must contain at least one number');
+      return false;
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      setPasswordError('Password must contain at least one special character');
+      return false;
+    }
+    setPasswordError('');
+    return true;
+  };
+  //@ts-ignore
+  const handleEmailChange = (e) => {
+    const newEmail = e.target.value;
+    setEmail(newEmail);
+    validateEmail(newEmail);
+  };
+  //@ts-ignore
+
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    validatePassword(newPassword);
+  };
+  //@ts-ignore
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    // Validate email and password before submission
+    const isEmailValid = validateEmail(email);
+    const isPasswordValid = validatePassword(password);
+
+    if (!isEmailValid || !isPasswordValid) {
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -31,13 +91,14 @@ const Register = () => {
         name: fullName,
         email: email,
         branch: branch,
-        rollNumber: rollNo,
         password: password,
       });
 
       localStorage.setItem('token', response.data.token);
       navigate('/dashboard');
-    } catch (err: any) {
+      //@ts-ignore
+    } catch (err) {
+      //@ts-ignore
       setError(err.response?.data?.message || 'Failed to create an account.');
     } finally {
       setLoading(false);
@@ -103,25 +164,7 @@ const Register = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Roll Number
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Hash className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="text"
-                    value={rollNo}
-                    onChange={(e) => setRollNo(e.target.value)}
-                    required
-                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder="Enter your roll number"
-                  />
-                </div>
-              </div>
-
+              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Branch
@@ -157,12 +200,15 @@ const Register = () => {
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={handleEmailChange}
                     required
-                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className={`block w-full pl-10 pr-3 py-2 border ${
+                      emailError ? 'border-red-500' : 'border-gray-300'
+                    } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
                     placeholder="Enter your email"
                   />
                 </div>
+                {emailError && <p className="mt-1 text-sm text-red-600">{emailError}</p>}
               </div>
 
               <div>
@@ -176,9 +222,11 @@ const Register = () => {
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handlePasswordChange}
                     required
-                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    className={`block w-full pl-10 pr-3 py-2 border ${
+                      passwordError ? 'border-red-500' : 'border-gray-300'
+                    } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
                     placeholder="Create a password"
                   />
                   <button
@@ -191,11 +239,13 @@ const Register = () => {
                     </span>
                   </button>
                 </div>
+                {passwordError && <p className="mt-1 text-sm text-red-600">{passwordError}</p>}
               </div>
 
               <button
                 type="submit"
-                disabled={loading}
+                  //@ts-ignore
+                disabled={loading || emailError || passwordError}
                 className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
@@ -235,11 +285,10 @@ const Register = () => {
           />
           <div className="absolute inset-0 flex items-center justify-center p-12">
             <div className="bg-white bg-opacity-50">
-            <div className="text-black text-center ">
-              <h2 className="pt-10 text-4xl font-bold mb-6">Welcome to NITJ Alumni Network</h2>
-              <p className="text-lg mb-8">Join our vibrant community of graduates and stay connected with your alma mater.</p>
-
-            </div>
+              <div className="text-black text-center">
+                <h2 className="pt-10 text-4xl font-bold mb-6">Welcome to NITJ Alumni Network</h2>
+                <p className="text-lg mb-8">Join our vibrant community of graduates and stay connected with your alma mater.</p>
+              </div>
             </div>
           </div>
         </div>

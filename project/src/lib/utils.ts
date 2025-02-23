@@ -18,11 +18,17 @@ interface VerificationData {
 export const generateVerificationForm = (data: VerificationData) => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
-
-  // Add Institute Logo and Header
-  doc.setFontSize(14);
+  const logoURL = "public/WhatsApp Image 2025-02-12 at 23.28.05_0a364ca2.jpg"; // Replace with the path to the institute's logo image
+  const logoWidth = 25;  // Reduced width for better fit
+const logoHeight = 25; // Reduced height
+const logoX = 10; // Keeps it aligned
+const logoY = 12; // Increased top margin for better spacing
+doc.addImage(logoURL, "PNG", logoX, logoY, logoWidth, logoHeight);
+  doc.setFontSize(13);
   doc.setFont("helvetica", "bold");
-  doc.text("DR B R AMBEDKAR NATIONAL INSTITUTE OF TECHNOLOGY", pageWidth / 2, 20, { align: "center" });
+  doc.text("DR B R AMBEDKAR NATIONAL INSTITUTE OF TECHNOLOGY", 105, 25, {
+    align: "center",
+  });
   doc.setFontSize(12);
   doc.text("Jalandhar - 144011, Punjab (India)", pageWidth / 2, 30, { align: "center" });
 

@@ -1,15 +1,19 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Bell, Search, User, Menu } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
 
 interface NavbarProps {
   onMenuClick: () => void;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
-  const { currentUser } = useAuth();
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
 
-  if (!currentUser) return null;
+  useEffect(() => {
+    const userEmail = localStorage.getItem('email'); // Assuming email is stored in localStorage
+    setCurrentUserEmail(userEmail);
+  }, []);
+
+  if (!currentUserEmail) return null;
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-10">
@@ -49,7 +53,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
                   <User className="h-5 w-5 text-indigo-600" />
                 </div>
                 <span className="hidden md:block text-sm font-medium text-gray-700">
-                  {currentUser.email}
+                  {currentUserEmail}
                 </span>
               </button>
             </div>
@@ -58,6 +62,6 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
       </div>
     </nav>
   );
-}
+};
 
 export default Navbar;

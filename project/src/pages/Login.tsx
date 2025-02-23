@@ -1,14 +1,63 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { LogIn, GraduationCap, Mail, Lock, AlertCircle, Loader } from 'lucide-react';
+import { LogIn, GraduationCap, Mail, Lock, AlertCircle, Loader, CheckCircle, XCircle } from 'lucide-react';
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+  });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+ 
+  const validateEmail = (email:string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      return "Email is required";
+    }
+    if (!emailRegex.test(email)) {
+      return "Please enter a valid email address";
+    }
+    return "";
+  };
+  //@ts-ignore
+  const validatePassword = (password) => {
+    if (!password) {
+      return "Password is required";
+    }
+    if (password.length < 8) {
+      return "Password must be at least 8 characters long";
+    }
+    return "";
+  };
+
+  const handleInputChange = (e:any) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // Real-time validation
+    if (name === "email") {
+      setErrors((prev) => ({
+        ...prev,
+        email: validateEmail(value),
+      }));
+    }
+    if (name === "password") {
+      setErrors((prev) => ({
+        ...prev,
+        password: validatePassword(value),
+      }));
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -17,7 +66,7 @@ const Login = () => {
     }
   }, []);
 
-  const fetchUserRole = async (token: string) => {
+  const fetchUserRole = async (token:string) => {
     try {
       const response = await fetch("http://localhost:5000/auth/me", {
         method: "GET",
@@ -45,8 +94,23 @@ const Login = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e:any) => {
     e.preventDefault();
+    
+    // Validate all fields before submission
+    const emailError = validateEmail(formData.email);
+    const passwordError = validatePassword(formData.password);
+    
+    setErrors({
+      email: emailError,
+      password: passwordError,
+    });
+
+    // If there are any validation errors, don't submit
+    if (emailError || passwordError) {
+      return;
+    }
+
     setError("");
     setLoading(true);
 
@@ -54,7 +118,10 @@ const Login = () => {
       const response = await fetch("http://localhost:5000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ 
+          email: formData.email, 
+          password: formData.password 
+        }),
       });
 
       const data = await response.json();
@@ -64,7 +131,7 @@ const Login = () => {
       localStorage.setItem("user", JSON.stringify(data.user));
 
       fetchUserRole(data.token);
-    } catch (err: any) {
+    } catch (err:any) {
       setError(err.message);
     } finally {
       setLoading(false);
@@ -106,13 +173,27 @@ const Login = () => {
                   </div>
                   <input
                     type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className={`block w-full pl-10 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                      errors.email ? 'border-red-500' : 'border-gray-300'
+                    }`}
                     placeholder="Enter your email"
                   />
+                  {formData.email && (
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                      {errors.email ? (
+                        <XCircle className="h-5 w-5 text-red-500" />
+                      ) : (
+                        <CheckCircle className="h-5 w-5 text-green-500" />
+                      )}
+                    </div>
+                  )}
                 </div>
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                )}
               </div>
 
               <div>
@@ -125,10 +206,12 @@ const Login = () => {
                   </div>
                   <input
                     type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className={`block w-full pl-10 pr-20 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
+                      errors.password ? 'border-red-500' : 'border-gray-300'
+                    }`}
                     placeholder="Enter your password"
                   />
                   <button
@@ -141,6 +224,9 @@ const Login = () => {
                     </span>
                   </button>
                 </div>
+                {errors.password && (
+                  <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                )}
               </div>
 
               <div className="flex items-center justify-between">
@@ -163,7 +249,8 @@ const Login = () => {
 
               <button
                 type="submit"
-                disabled={loading}
+                //@ts-ignore
+                disabled={loading || errors.email || errors.password}
                 className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
@@ -199,7 +286,6 @@ const Login = () => {
             alt="Campus"
             className="absolute inset-0 w-full h-full object-cover"
           />
-          <div className="absolute inset-0 "></div>
         </div>
       </div>
     </div>
