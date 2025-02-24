@@ -51,7 +51,7 @@ const RequestForm = () => {
           return;
         }
 
-        const response = await fetch('http://localhost:5000/auth/me', {
+        const response = await fetch('https://alumnii-erp.onrender.com/auth/me', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -94,7 +94,7 @@ const RequestForm = () => {
       setError('');
 
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/requests/submit', {
+      const response = await fetch('https://alumnii-erp.onrender.com/requests/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

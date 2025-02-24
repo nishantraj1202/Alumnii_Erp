@@ -87,7 +87,7 @@ const Register = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/auth/signup', {
+      const response = await axios.post('https://alumnii-erp.onrender.com/auth/signup', {
         name: fullName,
         email: email,
         branch: branch,

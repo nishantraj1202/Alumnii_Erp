@@ -116,7 +116,7 @@ const Dashboard: React.FC = () => {
           return;
         }
 
-        const response = await axios.get<{ user: User }>('http://localhost:5000/auth/me', {
+        const response = await axios.get<{ user: User }>('https://alumnii-erp.onrender.com/auth/me', {
           headers: { Authorization: `Bearer ${token}` }
         });
 

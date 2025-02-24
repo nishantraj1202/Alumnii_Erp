@@ -20,7 +20,7 @@ const ForgotPassword = () => {
     setError('');
     
     try {
-      await axios.post('http://localhost:5000/auth/forgot-password', { email });
+      await axios.post('https://alumnii-erp.onrender.com/auth/forgot-password', { email });
       setSuccess('Verification code sent to your email');
       setStep(2);
     } catch (err: any) {
@@ -36,7 +36,7 @@ const ForgotPassword = () => {
     setError('');
 
     try {
-      await axios.post('http://localhost:5000/auth/verify-code', {
+      await axios.post('https://alumnii-erp.onrender.com/auth/verify-code', {
         email,
         code: verificationCode
       });
@@ -60,7 +60,7 @@ const ForgotPassword = () => {
     setError('');
 
     try {
-      await axios.post('http://localhost:5000/auth/reset-password', {
+      await axios.post('https://alumnii-erp.onrender.com/auth/reset-password', {
         email,
         code: verificationCode,
         newPassword

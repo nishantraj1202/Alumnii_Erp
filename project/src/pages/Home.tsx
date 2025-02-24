@@ -116,7 +116,7 @@ export default function Home() {
 
   const fetchUserRole = async (token: string) => {
     try {
-      const response = await fetch("http://localhost:5000/auth/me", {
+      const response = await fetch("https://alumnii-erp.onrender.com/auth/me", {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -151,7 +151,7 @@ export default function Home() {
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
               <Link to="/" className="flex items-center space-x-2">
-                <img src="/src/assets/nitj_logo.png" alt="NITJ Logo" className="h-10 w-10" />
+                <img src="/src/nitj_logo.png" alt="NITJ Logo" className="h-10 w-10" />
                 <span className="text-xl font-bold text-gray-900">NITJ Alumni</span>
               </Link>
             </div>

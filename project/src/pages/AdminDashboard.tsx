@@ -45,7 +45,7 @@ const AdminDashboard = () => {
         return;
       }
 
-      const response = await axios.get('http://localhost:5000/requests/admin-requests', {
+      const response = await axios.get('https://alumnii-erp.onrender.com/requests/admin-requests', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -61,7 +61,7 @@ const AdminDashboard = () => {
   const fetchRequestDetails = async (requestId: string) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:5000/requests/${requestId}`, {
+      const response = await axios.get(`https://alumnii-erp.onrender.com/requests/${requestId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSelectedRequest(response.data.requestDetails);
@@ -86,7 +86,7 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        `http://localhost:5000/requests/${requestId}/status`,
+        `https://alumnii-erp.onrender.com/requests/${requestId}/status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` }}
       );

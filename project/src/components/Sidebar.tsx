@@ -43,7 +43,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const handleLogout = async () => {
     try {
       if (token) {
-        await axios.post('http://localhost:5000/auth/logout', {}, {
+        await axios.post('https://alumnii-erp.onrender.com/auth/logout', {}, {
           headers: { Authorization: `Bearer ${token}` }
         });
       }

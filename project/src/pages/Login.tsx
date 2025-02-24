@@ -68,7 +68,7 @@ const Login = () => {
 
   const fetchUserRole = async (token:string) => {
     try {
-      const response = await fetch("http://localhost:5000/auth/me", {
+      const response = await fetch("https://alumnii-erp.onrender.com/auth/me", {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -115,7 +115,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/auth/login", {
+      const response = await fetch("https://alumnii-erp.onrender.com/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 

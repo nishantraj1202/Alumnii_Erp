@@ -18,7 +18,7 @@ interface VerificationData {
 export const generateVerificationForm = (data: VerificationData) => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
-  const logoURL = "public/WhatsApp Image 2025-02-12 at 23.28.05_0a364ca2.jpg"; // Replace with the path to the institute's logo image
+  const logoURL = "WhatsApp Image 2025-02-12 at 23.28.05_0a364ca2.jpg"; // Replace with the path to the institute's logo image
   const logoWidth = 25;  // Reduced width for better fit
 const logoHeight = 25; // Reduced height
 const logoX = 10; // Keeps it aligned
