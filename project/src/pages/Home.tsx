@@ -151,7 +151,7 @@ export default function Home() {
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
               <Link to="/" className="flex items-center space-x-2">
-                <img src="/src/nitj_logo.png" alt="NITJ Logo" className="h-10 w-10" />
+                <img src="/static/images/nitj_logo.png" alt="NITJ Logo" className="h-10 w-10" />
                 <span className="text-xl font-bold text-gray-900">NITJ Alumni</span>
               </Link>
             </div>
