@@ -14,6 +14,8 @@ import {
   ExternalLink,
   Download,
   Mail,
+  LogOut,
+  Menu,
 } from 'lucide-react';
 import { generateVerificationForm } from '../lib/utils';
 import axios from 'axios';
@@ -48,6 +50,7 @@ const Dashboard: React.FC = () => {
   const [userData, setUserData] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const stats: Stat[] = [
     { 
@@ -144,7 +147,10 @@ const Dashboard: React.FC = () => {
       certificateId: `CERT-${Date.now()}`
     });
   };
-
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -206,12 +212,21 @@ const Dashboard: React.FC = () => {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
             <div>
               <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+                <button className='mr-2 pr-2' onClick={() => setMenuOpen(!menuOpen)}>
+                <Menu className="h-6 w-6 text-gray-600" />
+                </button>
                 <GraduationCap className="h-8 w-8 text-indigo-600 mr-3" />
+
                 Welcome back, {userData?.name}
+                
               </h1>
+              
+              </div>
               <p className="mt-1 text-gray-500">
                 Access your alumni dashboard and stay connected
               </p>
+              <div className="md:hidden">
+          
             </div>
             <div className="flex items-center space-x-4">
               <button
@@ -232,6 +247,22 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
+      {menuOpen && (
+        <div className="md:hidden bg-white shadow-md p-4 space-y-2">
+          <button 
+            onClick={handleDownloadCertificate} 
+            className="btn-primary w-full flex items-center "
+          >
+            <Download className="h-4 w-4 mr-6" /> Download Certificate
+          </button>
+          <button 
+            onClick={handleLogout} 
+            className="btn-primary w-full flex items-center"
+          >
+            <LogOut className="h-4 w-4 mr-6" /> Logout
+          </button>
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Grid */}
