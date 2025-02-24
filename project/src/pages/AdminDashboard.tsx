@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, FileText } from 'lucide-react';
+import { CheckCircle, XCircle, FileText, LogOut, Menu, Filter } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -31,6 +31,7 @@ const AdminDashboard = () => {
   const [updateLoading, setUpdateLoading] = useState<string | null>(null);
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
   const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -109,6 +110,11 @@ const AdminDashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/');
+    setMobileMenuOpen(false);
+  };
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
   };
 
   const filteredRequests = requests.filter(request => 
@@ -118,44 +124,85 @@ const AdminDashboard = () => {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center bg-gray-50">
-        <div className="text-lg">Loading...</div>
+        <div className="flex items-center space-x-2">
+          <div className="w-6 h-6 border-t-2 border-blue-500 rounded-full animate-spin"></div>
+          <div className="text-lg">Loading...</div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-          <h1 className="text-xl font-semibold text-gray-800">Admin Dashboard</h1>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded"
-          >
-            Logout
-          </button>
+      {/* Header with responsive navigation */}
+      <nav className="bg-white shadow-sm sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <h1 className="text-xl font-semibold text-gray-800">Admin Dashboard</h1>
+            
+            {/* Desktop navigation */}
+            <div className="hidden md:block">
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md flex items-center"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </button>
+            </div>
+            
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <button
+                onClick={toggleMobileMenu}
+                className="p-2 rounded-md text-gray-700 hover:bg-gray-100"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+            </div>
+          </div>
         </div>
+        
+        {/* Mobile menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white shadow-lg border-t">
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md flex items-center"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </button>
+            </div>
+          </div>
+        )}
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {error && (
-          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-            {error}
+          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md flex items-start">
+            <XCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" />
+            <span>{error}</span>
           </div>
         )}
 
-        <div className="mb-6 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as any)}
-              className="p-2 border rounded bg-white"
-            >
-              <option value="all">All Requests</option>
-              <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
-              <option value="rejected">Rejected</option>
-            </select>
+        {/* Filters section */}
+        <div className="mb-6 bg-white rounded-lg shadow-sm p-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex items-center space-x-2 w-full sm:w-auto">
+              <Filter className="w-5 h-5 text-gray-500" />
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value as any)}
+                className="p-2 border rounded-md bg-white flex-grow sm:flex-grow-0"
+              >
+                <option value="all">All Requests</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
             <span className="text-sm text-gray-500">
               Showing {filteredRequests.length} requests
             </span>
@@ -163,7 +210,7 @@ const AdminDashboard = () => {
         </div>
 
         {filteredRequests.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded shadow">
+          <div className="text-center py-12 bg-white rounded-lg shadow-sm">
             <FileText className="w-12 h-12 mx-auto text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900">No requests found</h3>
             <p className="text-gray-500">No requests match your current filter.</p>
@@ -171,8 +218,8 @@ const AdminDashboard = () => {
         ) : (
           <div className="space-y-4">
             {filteredRequests.map((request) => (
-              <div key={request._id} className="bg-white rounded-lg shadow-sm p-6">
-                <div className="flex justify-between items-start mb-4">
+              <div key={request._id} className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4 mb-4">
                   <div>
                     <h3 className="text-lg font-medium">{request.name}</h3>
                     <p className="text-sm text-gray-500">{request.email}</p>
@@ -180,31 +227,7 @@ const AdminDashboard = () => {
                       Submitted on {new Date(request.createdAt).toLocaleDateString()}
                     </p>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    {request.status === 'pending' && (
-                      <>
-                        <button
-                          onClick={() => handleUpdateStatus(request._id, 'approved')}
-                          disabled={updateLoading === request._id}
-                          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
-                        >
-                          <span className="flex items-center">
-                            <CheckCircle className="w-4 h-4 mr-2" />
-                            Approve
-                          </span>
-                        </button>
-                        <button
-                          onClick={() => handleUpdateStatus(request._id, 'rejected')}
-                          disabled={updateLoading === request._id}
-                          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
-                        >
-                          <span className="flex items-center">
-                            <XCircle className="w-4 h-4 mr-2" />
-                            Reject
-                          </span>
-                        </button>
-                      </>
-                    )}
+                  <div className="flex flex-wrap items-center gap-2 self-end sm:self-start">
                     <span
                       className={`px-3 py-1 rounded-full text-sm font-medium capitalize
                         ${request.status === 'approved' ? 'bg-green-100 text-green-800' : 
@@ -213,27 +236,48 @@ const AdminDashboard = () => {
                     >
                       {request.status}
                     </span>
+                    
+                    {request.status === 'pending' && (
+                      <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
+                        <button
+                          onClick={() => handleUpdateStatus(request._id, 'approved')}
+                          disabled={updateLoading === request._id}
+                          className="px-3 py-1.5 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 text-sm font-medium flex items-center"
+                        >
+                          <CheckCircle className="w-4 h-4 mr-1.5" />
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleUpdateStatus(request._id, 'rejected')}
+                          disabled={updateLoading === request._id}
+                          className="px-3 py-1.5 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 text-sm font-medium flex items-center"
+                        >
+                          <XCircle className="w-4 h-4 mr-1.5" />
+                          Reject
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Branch</label>
+                    <label className="text-sm font-medium text-gray-600">Branch</label>
                     <p className="text-sm">{request.branch}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Roll Number</label>
+                    <label className="text-sm font-medium text-gray-600">Roll Number</label>
                     <p className="text-sm">{request.rollNo}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Contact</label>
+                    <label className="text-sm font-medium text-gray-600">Contact</label>
                     <p className="text-sm">{request.mobileNo}</p>
                     {request.alternativeNo && (
                       <p className="text-sm text-gray-500">Alt: {request.alternativeNo}</p>
                     )}
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Email</label>
+                    <label className="text-sm font-medium text-gray-600">Email</label>
                     <p className="text-sm">{request.email}</p>
                     {request.alternativeEmail && (
                       <p className="text-sm text-gray-500">Alt: {request.alternativeEmail}</p>
@@ -245,13 +289,13 @@ const AdminDashboard = () => {
                   <div className="mt-4 pt-4 border-t">
                     {request.placed && (
                       <div className="mb-4">
-                        <label className="text-sm font-medium text-gray-500">Placement Details</label>
+                        <label className="text-sm font-medium text-gray-600">Placement Details</label>
                         <p className="text-sm">{request.placementDetails}</p>
                       </div>
                     )}
                     {request.futurePlans && (
                       <div>
-                        <label className="text-sm font-medium text-gray-500">Future Plans</label>
+                        <label className="text-sm font-medium text-gray-600">Future Plans</label>
                         <p className="text-sm">{request.futurePlans}</p>
                         {request.higherStudiesDetails && (
                           <p className="text-sm mt-2">{request.higherStudiesDetails}</p>
