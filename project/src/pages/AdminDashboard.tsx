@@ -17,9 +17,18 @@ interface Request {
   email: string;
   alternativeEmail?: string;
   placed?: boolean;
-  placementDetails?: string;
+  placementDetails?: {
+    companyName: string;
+    package: string;
+    city: string;
+  };
   futurePlans?: string;
-  higherStudiesDetails?: string;
+  higherStudiesDetails?: {
+    exam: string;
+    country: string;
+    course: string;
+    university: string;
+  };
   status: 'pending' | 'approved' | 'rejected';
   createdAt: string;
 }
@@ -290,7 +299,21 @@ const AdminDashboard = () => {
                     {request.placed && (
                       <div className="mb-4">
                         <label className="text-sm font-medium text-gray-600">Placement Details</label>
-                        <p className="text-sm">{request.placementDetails}</p>
+                        {request.placementDetails ? (
+                          <div className="mt-1">
+                            <p className="text-sm">
+                              <span className="font-medium">Company:</span> {request.placementDetails.companyName}
+                            </p>
+                            <p className="text-sm">
+                              <span className="font-medium">Package:</span> {request.placementDetails.package}
+                            </p>
+                            <p className="text-sm">
+                              <span className="font-medium">Location:</span> {request.placementDetails.city}
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-500">No details provided</p>
+                        )}
                       </div>
                     )}
                     {request.futurePlans && (
@@ -298,7 +321,20 @@ const AdminDashboard = () => {
                         <label className="text-sm font-medium text-gray-600">Future Plans</label>
                         <p className="text-sm">{request.futurePlans}</p>
                         {request.higherStudiesDetails && (
-                          <p className="text-sm mt-2">{request.higherStudiesDetails}</p>
+                          <div className="mt-2">
+                            <p className="text-sm">
+                              <span className="font-medium">Exam:</span> {request.higherStudiesDetails.exam}
+                            </p>
+                            <p className="text-sm">
+                              <span className="font-medium">Country:</span> {request.higherStudiesDetails.country}
+                            </p>
+                            <p className="text-sm">
+                              <span className="font-medium">Course:</span> {request.higherStudiesDetails.course}
+                            </p>
+                            <p className="text-sm">
+                              <span className="font-medium">University:</span> {request.higherStudiesDetails.university}
+                            </p>
+                          </div>
                         )}
                       </div>
                     )}
