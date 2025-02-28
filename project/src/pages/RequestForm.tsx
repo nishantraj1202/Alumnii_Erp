@@ -756,7 +756,7 @@ const RequestForm = () => {
               </button>
             )}
             
-            {currentStep < 3 ? (
+            {currentStep <= 3 ? (
               <button
                 type="button"
                 onClick={() => setCurrentStep(prev => prev + 1)}
