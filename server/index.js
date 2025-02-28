@@ -8,7 +8,22 @@ const requestRoutes = require("./routes/request");
 
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: "https://alumnii-erp.vercel.app" }));
+const allowedOrigins = [
+  "https://alumnii-erp.vercel.app",
+  "http://localhost:5173", // for local development
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    }
+  })
+);
 
 mongoose
   .connect(process.env.MONGODB_URL)
