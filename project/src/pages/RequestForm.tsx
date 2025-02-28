@@ -22,15 +22,27 @@ const RequestForm = () => {
     { id: 'TT', name: 'Textile Technology' }
   ];
 
+  const ratingOptions = [
+    { value: 'Excellent', label: 'Excellent' },
+    { value: 'Very Good', label: 'Very Good' },
+    { value: 'Good', label: 'Good' },
+    { value: 'Average', label: 'Average' },
+    { value: 'Poor', label: 'Poor' }
+  ];
+
   const [formData, setFormData] = useState({
+    // Personal Information
     name: '',
-    rollNo: '', // Added rollNo field
+    rollNo: '',
     branch: '',
     batchYear: '',
     mobileNo: '',
     alternativeNo: '',
     email: '',
     alternativeEmail: '',
+    address: '',
+    
+    // Placement Information
     placed: 'no',
     companyName: '',
     package: '',
@@ -39,7 +51,21 @@ const RequestForm = () => {
     higherStudiesType: '',
     foreignCountry: '',
     course: '',
-    university: ''
+    university: '',
+    
+    // Feedback Information
+    currentDesignation: '',
+    opinionAboutNITJ: '',
+    proudPoints: '',
+    courseRelevance: '',
+    facultyRating: 'Good',
+    infrastructureRating: 'Good',
+    libraryRating: 'Good',
+    educationalResourcesRating: 'Good',
+    canteenRating: 'Good',
+    hostelRating: 'Good',
+    grievanceHandlingRating: 'Good',
+    overallRating: 'Good'
   });
 
   useEffect(() => {
@@ -66,7 +92,7 @@ const RequestForm = () => {
           name: data.user.name || '',
           email: data.user.email || '',
           branch: data.user.branch || '',
-          rollNo: data.user.rollNo || '' // Added rollNo from user data
+          rollNo: data.user.rollNo || ''
         }));
       } catch (err) {
         setError('Failed to fetch user profile');
@@ -76,7 +102,7 @@ const RequestForm = () => {
 
     fetchUserProfile();
   }, [navigate]);
-//@ts-ignore
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -84,7 +110,7 @@ const RequestForm = () => {
       [name]: value
     }));
   };
-//@ts-ignore
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) return;
@@ -102,7 +128,7 @@ const RequestForm = () => {
         },
         body: JSON.stringify({
           ...formData,
-          rollNo: formData.rollNo // Ensure rollNo is included
+          rollNo: formData.rollNo
         })
       });
 
@@ -122,11 +148,10 @@ const RequestForm = () => {
       });
 
       navigate('/dashboard', { 
-        state: { message: 'Certificate request submitted successfully!' }
+        state: { message: 'Certificate request and feedback submitted successfully!' }
       });
       
     } catch (err) {
-      //@ts-ignore
       setError(err.message || 'Failed to submit request. Please try again.');
     } finally {
       setLoading(false);
@@ -135,7 +160,7 @@ const RequestForm = () => {
 
   const renderStepIndicator = () => (
     <div className="flex items-center justify-center mb-8">
-      {[1, 2].map((step) => (
+      {[1, 2, 3].map((step) => (
         <div key={step} className="flex items-center">
           <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
             currentStep === step 
@@ -146,8 +171,8 @@ const RequestForm = () => {
           }`}>
             {currentStep > step ? <CheckCircle className="h-5 w-5" /> : step}
           </div>
-          {step < 2 && (
-            <div className={`w-20 h-1 ${
+          {step < 3 && (
+            <div className={`w-16 h-1 ${
               currentStep > step ? 'bg-green-500' : 'bg-gray-200'
             }`} />
           )}
@@ -156,12 +181,12 @@ const RequestForm = () => {
     </div>
   );
 
-  const validateEmail = (email: string) => {
+  const validateEmail = (email) => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailRegex.test(email);
   };
   
-  const validatePhoneNumber = (phone: string) => {
+  const validatePhoneNumber = (phone) => {
     const phoneRegex = /^[0-9]{10}$/;
     return phoneRegex.test(phone);
   };
@@ -306,13 +331,40 @@ const RequestForm = () => {
             <p className="text-red-500 text-sm mt-1">Enter a valid email address.</p>
           )}
         </div>
+
+        <div className="sm:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Address
+          </label>
+          <textarea
+            name="address"
+            value={formData.address}
+            onChange={handleChange}
+            rows={3}
+            className="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="Enter your current address"
+          />
+        </div>
       </div>
     </div>
   );
   
-
   const renderPlacementInfo = () => (
     <div className="space-y-6">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Present Occupation/Designation
+        </label>
+        <input
+          type="text"
+          name="currentDesignation"
+          value={formData.currentDesignation}
+          onChange={handleChange}
+          className="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          placeholder="e.g., Software Engineer, Data Scientist, etc."
+        />
+      </div>
+
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Are you placed?
@@ -474,11 +526,210 @@ const RequestForm = () => {
     </div>
   );
 
+  const renderFeedbackForm = () => (
+    <div className="space-y-6">
+      <div className="border-b pb-4 mb-4">
+        <h3 className="text-lg font-medium text-gray-900 mb-2">Alumni Feedback</h3>
+        <p className="text-sm text-gray-600">Please provide your feedback to help us evaluate and improve our UG Engineering Programs.</p>
+      </div>
+
+      <div className="space-y-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Your Opinion About NIT Jalandhar
+          </label>
+          <textarea
+            name="opinionAboutNITJ"
+            value={formData.opinionAboutNITJ}
+            onChange={handleChange}
+            rows={3}
+            className="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="Share your thoughts about the institute"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Mention at least five points that make you feel proud to be associated with NIT Jalandhar as Alumni
+          </label>
+          <textarea
+            name="proudPoints"
+            value={formData.proudPoints}
+            onChange={handleChange}
+            rows={4}
+            className="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="List at least five points"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            How do you rate the courses that you have learnt at NIT Jalandhar in relation to your current job/occupation?
+          </label>
+          <textarea
+            name="courseRelevance"
+            value={formData.courseRelevance}
+            onChange={handleChange}
+            rows={3}
+            className="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="Describe the relevance of your courses to your current job"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Quality of Faculty Members
+            </label>
+            <select
+              name="facultyRating"
+              value={formData.facultyRating}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              {ratingOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Infrastructure and Lab facilities
+            </label>
+            <select
+              name="infrastructureRating"
+              value={formData.infrastructureRating}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              {ratingOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Institute Library Facilities
+            </label>
+            <select
+              name="libraryRating"
+              value={formData.libraryRating}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              {ratingOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Educational Resources
+            </label>
+            <select
+              name="educationalResourcesRating"
+              value={formData.educationalResourcesRating}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              {ratingOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Canteen Facilities
+            </label>
+            <select
+              name="canteenRating"
+              value={formData.canteenRating}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              {ratingOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Hostel Facilities
+            </label>
+            <select
+              name="hostelRating"
+              value={formData.hostelRating}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              {ratingOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Institute handles student's grievances properly
+            </label>
+            <select
+              name="grievanceHandlingRating"
+              value={formData.grievanceHandlingRating}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              {ratingOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Overall Rating of the NITJ
+            </label>
+            <select
+              name="overallRating"
+              value={formData.overallRating}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              {ratingOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="max-w-4xl mx-auto p-8">
       <div className="bg-white rounded-xl shadow-lg p-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
-          Certificate Request Form
+          Certificate Request & Alumni Feedback Form
         </h2>
 
         {renderStepIndicator()}
@@ -486,6 +737,7 @@ const RequestForm = () => {
         <form onSubmit={handleSubmit} className="space-y-8">
           {currentStep === 1 && renderPersonalInfo()}
           {currentStep === 2 && renderPlacementInfo()}
+          {currentStep === 3 && renderFeedbackForm()}
 
           {error && (
             <div className="text-red-500 text-sm flex items-center">
@@ -504,7 +756,7 @@ const RequestForm = () => {
               </button>
             )}
             
-            {currentStep < 2 ? (
+            {currentStep < 3 ? (
               <button
                 type="button"
                 onClick={() => setCurrentStep(prev => prev + 1)}

@@ -7,15 +7,44 @@ const router = express.Router();
 // Submit a Request
 router.post("/submit", authMiddleware, async (req, res) => {
   try {
-    const { name, branch, rollNo, mobileNo, alternativeNo, email, alternativeEmail, placed, placementDetails, futurePlans, higherStudiesDetails } = req.body;
+    const { 
+      // Personal Information
+      name, branch, rollNo, mobileNo, alternativeNo, email, alternativeEmail, address, batchYear,
+      
+      // Placement Information
+      placed, currentDesignation, companyName, package, city, futurePlans, higherStudiesType, 
+      foreignCountry, course, university,
+      
+      // Feedback Information
+      opinionAboutNITJ, proudPoints, courseRelevance, facultyRating, infrastructureRating,
+      libraryRating, educationalResourcesRating, canteenRating, hostelRating,
+      grievanceHandlingRating, overallRating
+    } = req.body;
+    
     const userId = req.user.id;
-    console.log(userId)
+    console.log(userId);
+    
     const findUser = await Request.findOne({ userId, status: "pending"});
     if (findUser) return res.status(404).json({ message: "You have already filled the form" });
+    
     // Find the admin of the branch
     const admin = await User.findOne({ branch, role: "admin" });
-
     if (!admin) return res.status(404).json({ message: "Admin not found for this branch" });
+
+    // Prepare placement details
+    const placementDetails = placed === 'yes' ? {
+      companyName,
+      package,
+      city
+    } : undefined;
+
+    // Prepare higher studies details
+    const higherStudiesDetails = futurePlans === 'Higher Studies' ? {
+      exam: higherStudiesType,
+      country: foreignCountry,
+      course,
+      university
+    } : undefined;
 
     const newRequest = new Request({
       userId,
@@ -26,17 +55,32 @@ router.post("/submit", authMiddleware, async (req, res) => {
       alternativeNo,
       email,
       alternativeEmail,
-      placed,
+      address,
+      batchYear,
+      placed: placed === 'yes',
+      currentDesignation,
       placementDetails,
       futurePlans,
       higherStudiesDetails,
+      opinionAboutNITJ,
+      proudPoints,
+      courseRelevance,
+      facultyRating,
+      infrastructureRating,
+      libraryRating,
+      educationalResourcesRating,
+      canteenRating,
+      hostelRating,
+      grievanceHandlingRating,
+      overallRating,
       assignedAdmin: admin._id,
     });
 
     await newRequest.save();
-    res.status(201).json({ message: "Request submitted successfully" });
+    res.status(201).json({ message: "Request and feedback submitted successfully" });
   } catch (err) {
-    res.status(500).json({ message: "Error submitting request"+err });
+    console.error("Error submitting request:", err);
+    res.status(500).json({ message: "Error submitting request: " + err.message });
   }
 });
 
@@ -93,6 +137,7 @@ router.put("/:requestId/status", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Error updating request status" });
   }
 });
+
 // Get Detailed Request Information
 router.get("/:requestId", authMiddleware, async (req, res) => {
   try {
@@ -123,6 +168,8 @@ router.get("/:requestId", authMiddleware, async (req, res) => {
           name: request.name,
           branch: request.branch,
           rollNo: request.rollNo,
+          batchYear: request.batchYear,
+          address: request.address,
           contact: {
             mobileNo: request.mobileNo,
             alternativeNo: request.alternativeNo,
@@ -130,13 +177,29 @@ router.get("/:requestId", authMiddleware, async (req, res) => {
             alternativeEmail: request.alternativeEmail
           }
         },
-        placement: {
+        career: {
+          currentDesignation: request.currentDesignation,
           placed: request.placed,
           details: request.placementDetails
         },
         future: {
           plans: request.futurePlans,
           higherStudiesDetails: request.higherStudiesDetails
+        },
+        feedback: {
+          opinionAboutNITJ: request.opinionAboutNITJ,
+          proudPoints: request.proudPoints,
+          courseRelevance: request.courseRelevance,
+          ratings: {
+            faculty: request.facultyRating,
+            infrastructure: request.infrastructureRating,
+            library: request.libraryRating,
+            educationalResources: request.educationalResourcesRating,
+            canteen: request.canteenRating,
+            hostel: request.hostelRating,
+            grievanceHandling: request.grievanceHandlingRating,
+            overall: request.overallRating
+          }
         },
         timestamps: {
           createdAt: request.createdAt,
